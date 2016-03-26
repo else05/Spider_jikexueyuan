@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/login" method="post">
+    <input type="text" name="account" value="jike_5318126" />
+    <input type="password" name="password" value="wgw05jn" />
+    <img src="/verify" id="verify" alt="验证码" />
+    <input type="text" name="verify" value="" />
+    <button id="check">check</button>
+    <input type="submit" value="提交">
+</form>
+<script src="jquery-1.8.1.min.js"></script>
+<script type="text/javascript">
+    $('#verify').on('click',function(){
+        $(this).attr('src','/verify?_'+Math.random()) ;
+    })
+    $('#check').on('click',function(){
+        $.ajax({
+            url:'/check' ,
+            data:{verify : $('[name="verify"]').val()} ,
+            type : 'post' ,
+            success : function(data){
+                console.log(data) ;
+            }
+        }) ;
+        return false ;
+    }) ;
+</script>
+</body>
+</html>

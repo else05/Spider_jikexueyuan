@@ -79,19 +79,24 @@ public class DownloadCallable implements Callable<String> {
                 randomAccessFile.seek(start);
                 FileChannel outChannel = randomAccessFile.getChannel();
 
-                long writeCount = outChannel.transferFrom(inChannel, start, (end - start));
+                long writeCount = 0L ;
+                synchronized (DownloadCallable.class) { // 下载的文件会出现花屏，加个同步看一下
+                    writeCount = outChannel.transferFrom(inChannel, start, (end - start));
+                }
 
                 MultithreadingDownload.threadPerformCount.getAndIncrement() ;
 
                 returnSrc.append("线程 ").append(Thread.currentThread().getName()).append(" 下载: ").append(file.getAbsolutePath()).append(" 位置： ")
                         .append(start).append("--->").append(end).append(" 预计下载： ").append(end - start).append(", 实际下载：").append(writeCount) ;
-                logger.info(returnSrc.toString());
+//                logger.info(returnSrc.toString());
                 inChannel.close();
                 outChannel.close();
                 randomAccessFile.close();
                 inputStream.close();
             } else {
-                returnSrc.append("\n线程 ").append(Thread.currentThread().getName()).append(" 返回网络状态码（下载失败）：").append(conn.getResponseCode()) ;
+                returnSrc.append("\n线程 ").append(Thread.currentThread().getName()).append(" 返回网络状态码（下载失败）：").append(conn.getResponseCode())
+                        .append("  【本地路径：").append(file.getAbsolutePath())
+                .append(" 【下载地址：").append(url.toString());
                 logger.info(returnSrc);
             }
         } catch (IOException e) {

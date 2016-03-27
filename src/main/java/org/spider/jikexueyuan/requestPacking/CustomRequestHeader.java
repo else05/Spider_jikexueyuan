@@ -21,9 +21,26 @@ public class CustomRequestHeader {
         this.httpGet =  get ;
     }
 
+    /**
+     * @param url
+     * @return
+     */
     public HttpGet getHttpGet(String url) {
         HttpGet get = new HttpGet(url);
         get.setHeader("Host","www.jikexueyuan.com") ;
+        get.setHeader("Referer","www.jikexueyuan.com") ;
+        get.setHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36") ;
+        return get ;
+    }
+
+    /**
+     * @param url 请求的地址
+     * @param host 请求头中主机地址
+     * @return
+     */
+    public HttpGet getHttpGet(String url , String host) {
+        HttpGet get = new HttpGet(url);
+        get.setHeader("Host",host) ;
         get.setHeader("Referer","www.jikexueyuan.com") ;
         get.setHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36") ;
         return get ;

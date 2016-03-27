@@ -128,4 +128,43 @@ public class AnalysisUrl {
         return urlList;
 
     }
+
+    /**
+     * 解析系列课程中该页面的课程地址
+     * @param pageUrl
+     * @return
+     * @throws IOException
+     */
+    public List<String[]> getSeriesUrl(String pageUrl) throws IOException {
+        BasicCookieStore cookieStore = new BasicCookieStore();
+        cookieStore.addCookies(cookieList.getCookieArray());
+        CloseableHttpClient client = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
+        HttpGet get = customRequestHeader.getHttpGet(pageUrl , "ke.jikexueyuan.com");
+//        HttpGet get = new HttpGet(pageUrl);
+
+        CloseableHttpResponse response = null;
+        response = client.execute(get);
+        HttpEntity entity = response.getEntity();
+        String s = EntityUtils.toString(entity);
+        Document doc = Jsoup.parse(s);
+        Elements select = doc.select("div.lessons.details-list>.inner-layout>div.lesson-item");
+        ArrayList<String[]> urlList = new ArrayList<>();
+        String[] urlArr = null ;
+        System.out.println("======系列课程中的数据========");
+//        String url = null ;
+        for (Element e : select) {
+//            url = e.select("a[jktag]").attr("href");
+            urlArr = new String[2] ;
+
+            urlArr[0] = new String(e.select("dl>dt.title").text()) ;
+            urlArr[1] = e.select("a[jktag]").attr("href") ;
+            urlList.add(urlArr);
+        }
+        response.close();
+        get.releaseConnection();
+        client.close();
+
+        return urlList;
+
+    }
 }

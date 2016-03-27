@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -39,7 +40,7 @@ public class MultithreadingDownload {
         for (int i = 0; i < threadNum; i++) {
             start = i * block;
             end = start + (block - 1);
-            System.out.println("start:" + start + " --> end:" + end);
+//            System.out.println("start:" + start + " --> end:" + end);
             Future<String> future = fixedThreadPool.submit(new DownloadCallable(file, len, start, end, url ));
             futureList.add(future);
         }

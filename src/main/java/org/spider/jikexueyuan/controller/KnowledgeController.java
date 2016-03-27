@@ -13,6 +13,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.spider.jikexueyuan.analysis.AnalysisCourse;
 import org.spider.jikexueyuan.analysis.AnalysisUrl;
 import org.spider.jikexueyuan.download.MultithreadingDownload;
 import org.spider.jikexueyuan.vo.CookieList;
@@ -42,6 +43,8 @@ public class KnowledgeController {
     private CookieList cookieList ;
     @Autowired
     private AnalysisUrl analysisUrl ;
+    @Autowired
+    private AnalysisCourse analysisCourse ; // 测试功能
 
     @Autowired
     private MultithreadingDownload multithreadingDownload ;
@@ -141,6 +144,7 @@ public class KnowledgeController {
         BasicCookieStore cookieStore = new BasicCookieStore();
         cookieStore.addCookies(cookieList.getCookieArray());
         CloseableHttpClient client = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
+        analysisCourse.series("http://ke.jikexueyuan.com/xilie");
         HttpGet get = this.getGet("http://www.jikexueyuan.com/course/636.html");
 
         CloseableHttpResponse response = null ;
@@ -198,9 +202,11 @@ public class KnowledgeController {
     @ResponseBody
     public String unitTest(String url) {
         List<String[]> knowledgeUrl = null;
+//        List<String[]> seriesUrl = null;
         String pathSrc = "G:/new/download/";
         try {
-            knowledgeUrl = analysisUrl.getKnowledgeUrl(url);
+//            seriesUrl = analysisUrl.getSeriesUrl(url); // 下载系列课程
+            knowledgeUrl = analysisUrl.getKnowledgeUrl(url); // 下载知识体系
             int i_ = 0;
 
             String[] urlArr = null ;
@@ -220,7 +226,7 @@ public class KnowledgeController {
                     if(Files.notExists(path.getParent())){
                         Files.createDirectories(path.getParent());
                     }
-                    logger.info("当前下载任务：" + path.toString() + " --> " + u[1] + ".mp4") ;
+                    logger.info("当前下载任务：" + path.toString() + " --> " + u[1] ) ;
                     if (Files.exists(path)) {
                         logger.info(path.toString() + " 已存在，跳过...");
                     }else{
@@ -247,5 +253,37 @@ public class KnowledgeController {
         httpGet.setHeader("Referer","www.jikexueyuan.com") ;
         httpGet.setHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36") ;
         return httpGet ;
+    }
+
+    public CookieList getCookieList() {
+        return cookieList;
+    }
+
+    public void setCookieList(CookieList cookieList) {
+        this.cookieList = cookieList;
+    }
+
+    public AnalysisUrl getAnalysisUrl() {
+        return analysisUrl;
+    }
+
+    public void setAnalysisUrl(AnalysisUrl analysisUrl) {
+        this.analysisUrl = analysisUrl;
+    }
+
+    public AnalysisCourse getAnalysisCourse() {
+        return analysisCourse;
+    }
+
+    public void setAnalysisCourse(AnalysisCourse analysisCourse) {
+        this.analysisCourse = analysisCourse;
+    }
+
+    public MultithreadingDownload getMultithreadingDownload() {
+        return multithreadingDownload;
+    }
+
+    public void setMultithreadingDownload(MultithreadingDownload multithreadingDownload) {
+        this.multithreadingDownload = multithreadingDownload;
     }
 }

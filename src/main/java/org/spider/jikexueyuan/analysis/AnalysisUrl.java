@@ -3,6 +3,7 @@ package org.spider.jikexueyuan.analysis;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -96,6 +97,7 @@ public class AnalysisUrl {
         BasicCookieStore cookieStore = new BasicCookieStore();
         cookieStore.addCookies(cookieList.getCookieArray());
         CloseableHttpClient client = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
+        HttpClientContext httpClientContext = new HttpClientContext();
         HttpGet get = customRequestHeader.getHttpGet(pageUrl);
 
         CloseableHttpResponse response = null;

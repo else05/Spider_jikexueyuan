@@ -1,12 +1,9 @@
 package org.spider.jikexueyuan.download;
 
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
 
-import java.io.File;
+ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -23,7 +20,7 @@ import java.util.concurrent.Callable;
  */
 public class DownloadCallable implements Callable<String> {
 
-    private static Logger logger = LogManager.getLogger(DownloadCallable.class) ;
+    private static Logger logger = LoggerFactory.getLogger(DownloadCallable.class) ;
     /**
      * 保存的文件路径
      */
@@ -97,10 +94,10 @@ public class DownloadCallable implements Callable<String> {
                 returnSrc.append("\n线程 ").append(Thread.currentThread().getName()).append(" 返回网络状态码（下载失败）：").append(conn.getResponseCode())
                         .append("  【本地路径：").append(file.getAbsolutePath())
                 .append(" 【下载地址：").append(url.toString());
-                logger.info(returnSrc);
+                logger.info(returnSrc.toString());
             }
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("{}" ,e);
         }
         return returnSrc.toString() ;
     }

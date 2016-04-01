@@ -1,11 +1,23 @@
 server:
     port: 9000
-spring:
-  datasource:
-    url: jdbc:mysql://192.168.2.3:3306/
-    username: root
-    password: root
-    driver-class-name: com.mysql.jdbc.Driver
-mybatis:
-  mapperLocations: classpath:mapper/*.xml
+#spring:
+#  datasource:
+#    url: jdbc:mysql://192.168.2.3:3306/
+#    username: root
+#    password: root
+#    driver-class-name: com.mysql.jdbc.Driver
+#mybatis:
+#  mapperLocations: classpath:mapper/*.xml
+logging:
+  level:
+    root: debug
+    org:
+      springframework:
+        web: debug
+  file: logs/logback.log
+  config: logback.xml
+  pattern:
+    file: 1%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n
+    console: 2%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n
+    level: 3%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n
 #  typeAliasesPackage:

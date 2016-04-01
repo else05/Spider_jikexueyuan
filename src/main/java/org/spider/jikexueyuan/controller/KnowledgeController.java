@@ -7,12 +7,13 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spider.jikexueyuan.analysis.AnalysisCourse;
 import org.spider.jikexueyuan.analysis.AnalysisUrl;
 import org.spider.jikexueyuan.download.MultithreadingDownload;
@@ -49,7 +50,7 @@ public class KnowledgeController {
     @Autowired
     private MultithreadingDownload multithreadingDownload ;
 
-    private static Logger logger = LogManager.getLogger(KnowledgeController.class) ;
+    private static Logger logger = LoggerFactory.getLogger(KnowledgeController.class) ;
 
     @RequestMapping("knowledge")
     public String toKnowledge(Map<String,Object> map) {
@@ -235,9 +236,9 @@ public class KnowledgeController {
                 }
             }
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("{}",e);
         } catch (URISyntaxException e) {
-            logger.error(e);
+            logger.error("{}" , e);
         }
         return "开始执行任务..";
     }

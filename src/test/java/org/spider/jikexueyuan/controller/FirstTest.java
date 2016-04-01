@@ -26,6 +26,7 @@ public class FirstTest {
     @Test
     public void first() throws Exception {
         ArrayList<Cookie> cookies = new ArrayList<>();
+        System.out.println(cookies.size());
     }
 
 }

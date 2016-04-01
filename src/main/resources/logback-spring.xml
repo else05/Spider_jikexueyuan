@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="org.springframework.web" level="DEBUG"/>
+
+    <!--<appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+        <!--<Encoding>UTF-8</Encoding>-->
+        <!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+            <!--&lt;!&ndash;日志文件输出的文件名&ndash;&gt;-->
+            <!--<FileNamePattern>myApp.log.%d{yyyy-MM-dd HH:mm}.log</FileNamePattern>-->
+            <!--<MaxHistory>30</MaxHistory>-->
+        <!--</rollingPolicy>-->
+        <!--<layout class="ch.qos.logback.classic.PatternLayout">-->
+            <!--&lt;!&ndash;格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符&ndash;&gt;-->
+            <!--<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n-->
+            <!--</pattern>-->
+        <!--</layout>-->
+        <!--&lt;!&ndash;日志文件最大的大小&ndash;&gt;-->
+        <!--<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">-->
+            <!--<MaxFileSize>5MB</MaxFileSize>-->
+        <!--</triggeringPolicy>-->
+    <!--</appender>-->
+
+    <appender name="dailyRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>logs/</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <FileNamePattern>rest-demo[%level].%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</Pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <!--<appender-ref ref="STDOUT" />-->
+        <appender-ref ref="dailyRollingFileAppender" />
+        <!--<appender-ref ref="FILE" />-->
+    </root>
+</configuration>

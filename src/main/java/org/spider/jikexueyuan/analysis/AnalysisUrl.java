@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Created by Else05 on 2016/3/23.
  */
-@Component
+//@Component
 public class AnalysisUrl {
     @Autowired
     private CookieList cookieList;

@@ -7,6 +7,8 @@ import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -33,16 +35,16 @@ import java.util.Map;
  * Created by Else05 on 2016/3/30.
  */
 public class ConnectionUtils {
-    private static volatile CloseableHttpClient client ;
-    private static volatile BasicCookieStore cookieStore ;
+    private static volatile CloseableHttpClient client;
+    private static volatile BasicCookieStore cookieStore;
     /**
      * 连接池列表
      * 保存已经实例的连接池对象，方便自定义的GC线程进行连接回收操作
      */
-    private static List<PoolingHttpClientConnectionManager> poolList = new ArrayList<>(16) ;
+    private static List<PoolingHttpClientConnectionManager> poolList = new ArrayList<>(16);
 
     public ConnectionUtils() throws Exception {
-        throw new Exception("静态工具类禁止实例") ;
+        throw new Exception("静态工具类禁止实例");
     }
 
     public static RequestConfig getRequestConfig() {
@@ -51,11 +53,12 @@ public class ConnectionUtils {
                 .setConnectionRequestTimeout(30000)
                 .setConnectTimeout(30000)
                 .setCookieSpec(CookieSpecs.STANDARD_STRICT)
-                .build() ;
+                .build();
     }
 
     /**
      * 取得连接池
+     *
      * @return
      */
     public static PoolingHttpClientConnectionManager getPool() {
@@ -67,7 +70,7 @@ public class ConnectionUtils {
         poolCM.setDefaultMaxPerRoute(20);
 //        poolCM.setMaxPerRoute();
         poolList.add(poolCM);
-        return poolCM ;
+        return poolCM;
     }
 
     public static HttpRequestRetryHandler getHttpRequestRetryHandler() {
@@ -106,11 +109,11 @@ public class ConnectionUtils {
         };
     }
 
-    public static CloseableHttpClient getNewHttpClient(RequestConfig requestConfig ,
-                                                    HttpRequestRetryHandler httpRequestRetryHandler ,
-                                                    PoolingHttpClientConnectionManager poolCM ) {
+    public static CloseableHttpClient getNewHttpClient(RequestConfig requestConfig,
+                                                       HttpRequestRetryHandler httpRequestRetryHandler,
+                                                       PoolingHttpClientConnectionManager poolCM) {
         // 根据传入的参数返回一个HttpClient
-        return  HttpClientBuilder.create()
+        return HttpClientBuilder.create()
                 .setDefaultRequestConfig(requestConfig)
                 .setRetryHandler(httpRequestRetryHandler)
                 .setConnectionManager(poolCM).build();
@@ -124,22 +127,22 @@ public class ConnectionUtils {
                             .setDefaultRequestConfig(ConnectionUtils.getRequestConfig())
                             .setRetryHandler(ConnectionUtils.getHttpRequestRetryHandler())
                             .setConnectionManager(ConnectionUtils.getPool())
-                            .build() ;
+                            .build();
                 }
             }
         }
-        return client ;
+        return client;
     }
 
     public static BasicCookieStore getCookieStore() {
         if (cookieStore == null) {
             synchronized (ConnectionUtils.class) {
                 if (cookieStore == null) {
-                    cookieStore = new BasicCookieStore() ;
+                    cookieStore = new BasicCookieStore();
                 }
             }
         }
-        return cookieStore ;
+        return cookieStore;
     }
 
 //    public static BasicCookieStore setCookieStore(BasicCookieStore cookieStore , ) {
@@ -157,19 +160,19 @@ public class ConnectionUtils {
         return poolList;
     }
 
-    public static HttpRequestBase setHeaders(Map<String , String> map , HttpRequestBase httpRequestBase) {
+    public static HttpRequestBase setHeaders(Map<String, String> map, HttpRequestBase httpRequestBase) {
         if (map == null || map.size() == 0) {
-            return httpRequestBase ;
+            return httpRequestBase;
         }
-        for (Map.Entry<String, String> entry:map.entrySet()) {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             if (StringUtils.isEmpty(key) || StringUtils.isEmpty(value)) {
                 continue;
             }
-            httpRequestBase.setHeader(key,value);
+            httpRequestBase.setHeader(key, value);
         }
-        return httpRequestBase ;
+        return httpRequestBase;
     }
 
     public static void setPoolList(List<PoolingHttpClientConnectionManager> poolList) {
@@ -179,18 +182,32 @@ public class ConnectionUtils {
 
     /**
      * 根据响应头中的Content-Range 判断返回的字节和请求需要返回的字节是否匹配
-     *  比如：Content-Range:bytes 0-11424777/11424778
+     * 比如：Content-Range:bytes 0-11424777/11424778
+     *
      * @return
      */
-    public static boolean checkRange(Header header , long start , long end) {
+    public static boolean checkRange(Header header, long start, long end) {
         String value = header.getValue();
         if (value == null || value.trim().length() == 0) {
-            return false ;
+            return false;
         }
         String[] split = value.split("\\D+");
         if (split.length != 3) {
-            return false ;
+            return false;
         }
-        return Long.getLong(split[0]) == start && Long.getLong(split[1]) == end ? true : false ;
+        return Long.getLong(split[0]) == start && Long.getLong(split[1]) == end ? true : false;
+    }
+
+    public static HttpUriRequest getHttp(boolean isPost, String url, String host, String referer) {
+        HttpUriRequest http = null;
+        if (isPost) {
+            http = new HttpPost(url);
+        } else {
+            http = new HttpGet(url);
+        }
+        http.setHeader("Host", StringUtils.isEmpty(host) ? "www.jikexueyuan.com" : host);
+        http.setHeader("Referer", StringUtils.isEmpty(referer) ? "http://www.jikexueyuan.com/" : referer);
+        http.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36");
+        return http;
     }
 }

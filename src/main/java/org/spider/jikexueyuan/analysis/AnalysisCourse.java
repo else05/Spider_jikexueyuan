@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * 测试页面解析
  * Created by Else05 on 2016/3/23.
  */
-@Component
+//@Component
 public class AnalysisCourse {
     @Autowired
     private CookieList cookieList ;

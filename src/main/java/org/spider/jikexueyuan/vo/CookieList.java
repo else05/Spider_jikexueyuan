@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Else05 on 2016/3/19.
  */
-@Component
+//@Component
 public class CookieList {
     private List<Cookie> cookies ;
 

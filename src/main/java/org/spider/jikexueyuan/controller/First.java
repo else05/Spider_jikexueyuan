@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Created by Else05 on 2016/3/18.
  */
-@Controller
+//@Controller
 public class First {
     @Autowired
     private CookieList cookieList ;

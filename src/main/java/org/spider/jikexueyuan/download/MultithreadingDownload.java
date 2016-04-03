@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by Else05 on 2016/3/22.
  */
-@Component
+//@Component
 public class MultithreadingDownload {
     /**
      * 存放线程返回的值

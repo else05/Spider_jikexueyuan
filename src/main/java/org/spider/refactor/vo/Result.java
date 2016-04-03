@@ -2,18 +2,27 @@ package org.spider.refactor.vo;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * 保存要返回的数据,最终会转成json作为返回的数据
  * Created by Else05 on 2016/4/2.
  */
-@Component
+//@Component
 public class Result {
     private String msg ;
     private boolean status ;
+    private Map<String , String> map ;
 
     public Result(String msg, boolean status) {
         this.msg = msg;
         this.status = status;
+    }
+
+    public Result(String msg, boolean status, Map<String, String> map) {
+        this.msg = msg;
+        this.status = status;
+        this.map = map;
     }
 
     public String getMsg() {
@@ -30,5 +39,13 @@ public class Result {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public Map<String, String> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, String> map) {
+        this.map = map;
     }
 }

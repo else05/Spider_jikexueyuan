@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <logger name="org.springframework.web" level="DEBUG"/>
+    <logger name="org.springframework.web" level="INFO"/>
 
     <!--<appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">-->
         <!--<Encoding>UTF-8</Encoding>-->
@@ -21,22 +21,41 @@
         <!--</triggeringPolicy>-->
     <!--</appender>-->
 
-    <appender name="dailyRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>logs/</File>
+    <appender name="warnFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>logs\download-warn%d{yyyy-MM-dd}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%d{HH:mm:ss} [%thread] %-5level %logger{5} - %msg %n</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN,ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="infoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--<File>logs/</File>-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <FileNamePattern>rest-demo[%level].%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>logs\download-info%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days' worth of history -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
-            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</Pattern>
+            <Pattern>%d{HH:mm:ss} [%thread] %-5level %logger{5} - %msg %n</Pattern>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>info</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
     </appender>
 
     <root level="INFO">
-        <!--<appender-ref ref="STDOUT" />-->
-        <appender-ref ref="dailyRollingFileAppender" />
+        <appender-ref ref="infoFile" />
+        <appender-ref ref="warnFile" />
         <!--<appender-ref ref="FILE" />-->
     </root>
 </configuration>

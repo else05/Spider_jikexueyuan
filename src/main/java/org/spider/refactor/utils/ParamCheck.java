@@ -6,15 +6,15 @@ package org.spider.refactor.utils;
 public class ParamCheck {
     public static boolean isEmpty(String ... args) {
         if (args == null || args.length == 0) {
-            return false ;
+            return true ;
         }
         String s = null ;
         for (int i = 0; i < args.length; i++) {
             s = args[i] ;
             if (s == null || "".equals(s.trim())) {
-                return false ;
+                return true ;
             }
         }
-        return true ;
+        return false ;
     }
 }

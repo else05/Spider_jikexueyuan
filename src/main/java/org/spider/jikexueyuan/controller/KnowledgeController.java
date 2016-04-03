@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * Created by Else05 on 2016/3/20.
  */
-@Controller
+//@Controller
 public class KnowledgeController {
     @Autowired
     private CookieList cookieList ;

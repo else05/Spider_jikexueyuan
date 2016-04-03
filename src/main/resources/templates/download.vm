@@ -5,10 +5,16 @@
     <title>Title</title>
 </head>
 <body>
-<select name="download" id="">
-    #foreach($elem in $!list)
-        <option>$!elem</option>
-    #end
+<select name="first" id="">
+    <option value="1">职业路径课程</option>
+    <option value="2">知识体系课程</option>
+    <option value="3">精品系列课程</option>
+</select>
+<select name="second" id="">
+
+</select>
+<select name="third" id="">
+
 </select>
 </body>
 </html>

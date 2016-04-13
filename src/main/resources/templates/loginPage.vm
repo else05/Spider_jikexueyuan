@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="bootstrap/css/boostrap.min.css"/>
+    <script src="jquery-1.8.1.min.js"></script>
+    <scrip src="bootstrap/js/bootsrap.min.js"/>
 </head>
 <body>
 <form action="/login" method="post">
@@ -11,9 +14,9 @@
     <img src="/verify" id="verify" alt="验证码" />
     <input type="text" name="verify" value="" />
     <button id="check">check</button>
-    <input type="submit" value="提交">
+    <button id="submit">提交</button>
 </form>
-<script src="jquery-1.8.1.min.js"></script>
+
 <script type="text/javascript">
     $('#verify').on('click',function(){
         $(this).attr('src','/verify?_'+Math.random()) ;
@@ -25,6 +28,24 @@
             type : 'post' ,
             success : function(data){
                 console.log(data) ;
+            }
+        }) ;
+        return false ;
+    }) ;
+    $('#submit').on('click',function(){
+        $.ajax({
+            url:'/login' ,
+            data:{
+                account:$('input[name="account"]').val() ,
+                password : $('input[name="password"]').val() ,
+                verify : $('[name="verify"]').val()
+            } ,
+            type : 'post' ,
+            success : function(data){
+                console.log(data) ;
+                if(data.status) {
+                    window.location.href = '/downloadPage' ;
+                }
             }
         }) ;
         return false ;

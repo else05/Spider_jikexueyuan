@@ -3,18 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="jquery-1.8.1.min.js"></script>
 </head>
 <body>
-<select name="first" id="">
-    <option value="1">职业路径课程</option>
-    <option value="2">知识体系课程</option>
-    <option value="3">精品系列课程</option>
+<select name="first" id="first">
+    <option value="-1">请选择---</option>
+    <option value="0">职业路径课程</option>
+    <option value="1">知识体系课程</option>
+    <option value="2">精品系列课程</option>
 </select>
-<select name="second" id="">
+<select name="second" id="second">
 
 </select>
-<select name="third" id="">
+<select name="third" id="third">
 
 </select>
+<button id="download">下载</button>
+
+<script type="text/javascript">
+    $('#download').on('click',function(){
+        var firstKey = $.trim($('#first option:selected').text()) ;
+        var firstVal = $('#first').val() ;
+        var secondKey = $.trim($('#second option:selected').text()) ;
+        var secondVal = $('#second').val() ;
+        var thirdKey = $.trim($('#third option:selected').text()) ;
+        var thirdVal = $('#third').val() ;
+        var isThird = false ;
+        if(!firstVal){
+            console.warn("请选择一级菜单") ;
+            return ;
+        }else if(!secondVal){
+            console.warn("请选择二级菜单") ;
+            return ;
+        }else if(thirdVal){
+            isThird = true ;
+        }
+        $.ajax({
+            url:'/download' ,
+            data:{
+                firstKey:firstKey,
+                firstVal: firstVal,
+                secondKey: secondKey,
+                secondVal: secondVal,
+                thirdKey: thirdKey,
+                thirdVal: thirdVal
+            } ,
+            type : 'post' ,
+            success : function(data){
+                console.log(data) ;
+                if(!data.status) {
+                    return ;
+                }
+
+//                var html = new Array() ;
+//                html.push('<option value="-1">请选择---</option>') ;
+//                var map = data.map ;
+//                for(var item in map){
+//                    if(map.hasOwnProperty(item)){
+//                        html.push('<option value="' + map[item] + '">' + item + '</option>') ;
+//                    }
+//                }
+////                if()
+//                $('#second').empty().append(html.join('')) ;
+
+            }
+        }) ;
+    }) ;
+    $('#first').change(function(){
+        console.info("change") ;
+        $.ajax({
+            url:'/list' ,
+            data:{
+                type:$('#first').val()
+            } ,
+            type : 'post' ,
+            success : function(data){
+                console.log(data) ;
+                if(!data.status) {
+                    return ;
+                }
+
+                var html = new Array() ;
+                html.push('<option value="-1">请选择---</option>') ;
+                var map = data.map ;
+                for(var item in map){
+                    if(map.hasOwnProperty(item)){
+                        html.push('<option value="' + map[item] + '">' + item + '</option>') ;
+                    }
+                }
+                $('#second').empty().append(html.join('')) ;
+
+            }
+        })
+    }) ;
+    $('#second').change(function(){
+        var secondVal = $('#second').val() ;
+        if(!secondVal){
+            console.warn('请选择二级菜单') ;
+            return ;
+        }
+        $.ajax({
+            url:'/list2' ,
+            data:{
+                type:$('#first').val(),
+                secondVal:secondVal
+            } ,
+            type : 'post' ,
+            success : function(data){
+                console.log(data) ;
+                if(!data.status) {
+                    return ;
+                }
+
+                var html = new Array() ;
+                html.push('<option value="-1">请选择---</option>') ;
+                var map = data.map ;
+                for(var item in map){
+                    if(map.hasOwnProperty(item)){
+                        html.push('<option value="' + map[item] + '">' + item.replace(/^\d+\./g,'') + '</option>') ;
+                    }
+                }
+                $('#third').empty().append(html.join('')) ;
+
+            }
+        })
+    }) ;
+
+</script>
 </body>
 </html>

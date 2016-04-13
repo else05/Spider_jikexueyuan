@@ -84,14 +84,14 @@ public class AnalysisCourse {
             valArr = map.get("valSelect").split("@");
             if ("text".equals(nameArr[0])) {
                 key = element.select(nameArr[1]).text() ;
-            }else if("".equals(nameArr[1].trim())){
+            }else if("attr".equals(nameArr[0]) && nameArr.length == 1){// 对应mapper中的("valSelect" , "attr@") ;
                 key = element.attr(map.get("namePro")) ;
             }else{
                 key = element.select(nameArr[1]).attr(map.get("namePro")) ;
             }
             if ("text".equals(valArr[0])) {
                 val = element.select(valArr[1]).text() ;
-            }else if("".equals(valArr[1].trim())){
+            }else if("attr".equals(valArr[0]) && valArr.length == 1){
                 val = element.attr(map.get("valPro")) ;
             }else{
                 val = element.select(valArr[1]).attr(map.get("valPro")) ;

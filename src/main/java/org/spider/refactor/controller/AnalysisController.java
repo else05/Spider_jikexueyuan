@@ -1,12 +1,11 @@
 package org.spider.refactor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -18,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spider.refactor.analysis.AnalysisCourse;
 import org.spider.refactor.utils.ConnectionUtils;
+import org.spider.refactor.vo.DownloadParameter;
 import org.spider.refactor.vo.Result;
 import org.spider.refactor.vo.SelectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -89,6 +87,139 @@ public class AnalysisController {
     }
 
     /**
+     * @param type  1.职业路径课程  2.知识体系课程  3.精品系列课程
+     * @return
+     */
+    @RequestMapping("list2")
+    @ResponseBody
+    public Result list2(Integer type , String secondVal) {
+        if (type == null || type < 0 || type > 2) {
+            return new Result("请求参数错误！", false);
+        }
+        // 三大类课程
+        String[] url = {
+                "http://ke.jikexueyuan.com/zhiye/",
+                "http://www.jikexueyuan.com/path/",
+                "http://ke.jikexueyuan.com/xilie/"
+        } ;
+        // jsoup选择器映射参数  （根据些参数返回对应的映射map）
+        String[][] mapArr = {
+                {"zhiyeMap","zhiyeMap2"} ,
+                {"pathMap" , "pathMap2"} ,
+                {"xilieMap" , "xilieMap2"}
+        } ;
+
+        // 注意 referer 要加上http://  （http://www.xxxx.com/）   而host则不用加 （www.xxxx.com）
+        HttpUriRequest http = ConnectionUtils.getHttp(false, StringUtils.isNotEmpty(secondVal) ? secondVal : url[type], type == 1 ? "www.jikexueyuan.com" : "ke.jikexueyuan.com" ,null);
+        HttpClientContext context = new HttpClientContext();
+        context.setCookieStore(cookieStore);
+
+        Result result = this.sendRequest(http, context, mapArr[type][StringUtils.isNotEmpty(secondVal) ? 1 : 0]);
+        if (type == 2 && StringUtils.isEmpty(secondVal)) { // 处理职业课程中的分页数据
+            HttpPost post = (HttpPost) ConnectionUtils.getHttp(true,
+                    "http://ke.jikexueyuan.com/xilie/more", type == 1 ? "www.jikexueyuan.com" : "ke.jikexueyuan.com",
+                    null);
+
+            Map<String, String> stringMap = this.zhiyeReadMore(post, context, result.getMap());
+            result.setMap(stringMap);
+        }
+
+        return result ;
+    }
+
+    /**
+     * @param firstVal  1.职业路径课程  2.知识体系课程  3.精品系列课程
+     * @return
+     */
+    @RequestMapping("download")
+    @ResponseBody
+    public Result download(String firstKey , Integer firstVal , String secondKey , String secondVal , String thirdKey , String thirdVal) {
+
+        // 三大类课程
+        String[] url = {
+                "http://ke.jikexueyuan.com/zhiye/",
+                "http://www.jikexueyuan.com/path/",
+                "http://ke.jikexueyuan.com/xilie/"
+        } ;
+        // jsoup选择器映射参数  （根据些参数返回对应的映射map）
+        String[][] mapArr = {
+                {"zhiyeMap","zhiyeMap2"} ,
+                {"pathMap" , "pathMap2"} ,
+                {"xilieMap" , "xilieMap2"}
+        } ;
+
+        String urlSrc = null ;
+        String mapSrc = null ;
+        if (StringUtils.isNotEmpty(thirdVal)) {
+            urlSrc = thirdVal ;
+            mapSrc = "pageMap" ;
+        } else if (StringUtils.isNotEmpty(secondVal)) {
+            urlSrc = secondVal;
+            mapSrc = mapArr[firstVal][1] ;
+        } else {
+            urlSrc = url[firstVal] ;
+            mapSrc = mapArr[firstVal][0] ;
+        }
+
+        String host = firstVal == 1 || urlSrc.matches("^http://.+\\d+\\.html$") ? "www.jikexueyuan.com" : "ke.jikexueyuan.com" ;
+        Result result = this.analysisUrl(false, urlSrc, host , null, mapSrc);
+        if(urlSrc.matches("^http://.+\\d+\\.html$")){
+        }
+
+        Map<String, String> map = result.getMap();
+        Result resultTem = null ;
+        if(StringUtils.isNotEmpty(thirdVal)){
+            for (Map.Entry<String, String> entry :
+                    map.entrySet()) {
+                if (resultTem == null) {
+                    resultTem = this.analysisUrl(false, entry.getValue(), host, null, "singleSelectMap");
+                }else{
+                    resultTem.mergeMap(this.analysisUrl(false, entry.getValue(), host, null, "singleSelectMap"));
+                }
+            }
+            // TODO 进入下载
+        }else if(StringUtils.isNotEmpty(secondVal)){
+            for (Map.Entry<String, String> entry :
+                    map.entrySet()) {
+                if (resultTem == null) {
+                    resultTem = this.analysisUrl(false, entry.getValue(), host, null, mapSrc);
+                }else{
+                    resultTem.mergeMap(this.analysisUrl(false, entry.getValue(), host, null, mapSrc));
+                }
+            }
+            //TODO 进入单页面的解析
+        }
+
+        return result ;
+    }
+
+    /**
+     * 根据传入的参数请求并解析页面中的url，返回Result对象
+     * @param isPost
+     * @param url
+     * @param host
+     * @param referer
+     * @param strMapper
+     * @return
+     */
+    public Result analysisUrl(boolean isPost , String url , String host , String referer ,
+                            String strMapper){
+        HttpUriRequest http = ConnectionUtils.getHttp(isPost, url , host , referer);
+        HttpClientContext context = new HttpClientContext();
+        context.setCookieStore(cookieStore);
+        Result result = this.sendRequest(http, context, strMapper);
+        if ("http://ke.jikexueyuan.com/xilie/".equals(url)) { // 处理职业课程中的分页数据
+            HttpPost post = (HttpPost) ConnectionUtils.getHttp(true,
+                    "http://ke.jikexueyuan.com/xilie/more", host,
+                    referer);
+
+            Map<String, String> stringMap = this.zhiyeReadMore(post, context, result.getMap());
+            result.setMap(stringMap);
+        }
+        return result ;
+    }
+
+    /**
      * 根据参数请求页面并返回解析后的数据
      * @param http
      * @param context
@@ -119,7 +250,7 @@ public class AnalysisController {
     }
 
     /**
-     * 把职业中的所有分页数据读取出来
+     * 把系列中的所有分页数据读取出来
      * @param post
      * @param context
      * @param resultMap

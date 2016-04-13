@@ -25,6 +25,25 @@ public class Result {
         this.map = map;
     }
 
+    public void mergeMap(Result result){
+        if (result == null || result.getMap() == null || result.getMap().size() == 0) {
+            return;
+        }
+        this.mergeMap(result.getMap());
+    }
+
+    public void mergeMap(Map<String ,String> map){
+        if (map == null || map.size() == 0) {
+            return;
+        }
+
+        if (this.map == null || this.map.size() == 0) {
+            this.map = map ;
+        }else{
+            this.map.putAll(map);
+        }
+    }
+
     public String getMsg() {
         return msg;
     }
